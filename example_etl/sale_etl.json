@@ -1,0 +1,39 @@
+{
+  "name" : "sale_etl",
+  "jobMode" : "VISUAL",
+  "description" : "",
+  "role" : "arn:aws:iam::293449056871:role/glue_etl_role",
+  "executionProperty" : {
+    "maxConcurrentRuns" : 1
+  },
+  "command" : {
+    "name" : "glueetl",
+    "scriptLocation" : "s3://aws-glue-assets-293449056871-us-east-1/scripts/glue_etl.py",
+    "pythonVersion" : "3"
+  },
+  "defaultArguments" : {
+    "--enable-metrics" : "true",
+    "--enable-spark-ui" : "true",
+    "--spark-event-logs-path" : "s3://aws-glue-assets-293449056871-us-east-1/sparkHistoryLogs/",
+    "--enable-job-insights" : "false",
+    "--enable-glue-datacatalog" : "true",
+    "--job-bookmark-option" : "job-bookmark-disable",
+    "--job-language" : "python",
+    "--TempDir" : "s3://aws-glue-assets-293449056871-us-east-1/temporary/"
+  },
+  "maxRetries" : 0,
+  "allocatedCapacity" : 2,
+  "timeout" : 120,
+  "maxCapacity" : 2.0,
+  "glueVersion" : "4.0",
+  "numberOfWorkers" : 2,
+  "workerType" : "G.1X",
+  "executionClass" : "STANDARD",
+  "codeGenConfigurationNodes" : "{\"node-1708783631007\":{\"S3CsvSource\":{\"AdditionalOptions\":{\"EnableSamplePath\":false,\"SamplePath\":\"s3://sales-2019/sales.csv\"},\"Escaper\":\"\",\"Exclusions\":[],\"Name\":\"Amazon S3\",\"OptimizePerformance\":false,\"OutputSchemas\":[{\"Columns\":[{\"Name\":\"event_time\",\"Type\":\"string\"},{\"Name\":\"event_type\",\"Type\":\"string\"},{\"Name\":\"product_id\",\"Type\":\"string\"},{\"Name\":\"category_id\",\"Type\":\"string\"},{\"Name\":\"category_code\",\"Type\":\"string\"},{\"Name\":\"brand\",\"Type\":\"string\"},{\"Name\":\"price\",\"Type\":\"string\"},{\"Name\":\"user_id\",\"Type\":\"string\"},{\"Name\":\"user_session\",\"Type\":\"string\"},{\"Name\":\"event_year\",\"Type\":\"string\"},{\"Name\":\"event_month\",\"Type\":\"string\"}]}],\"Paths\":[\"s3://sales-2019/sales.csv\"],\"QuoteChar\":\"disabled\",\"Recurse\":true,\"Separator\":\"comma\",\"WithHeader\":true}},\"node-1708786050377\":{\"SelectFromCollection\":{\"Index\":0,\"Inputs\":[\"node-1708784412691\"],\"Name\":\"originalData\"}},\"node-1708786714412\":{\"SelectFields\":{\"Inputs\":[\"node-1708786050377\"],\"Name\":\"product_df_select\",\"Paths\":[[\"event_time\"],[\"product_id\"],[\"category_code\"],[\"brand\"],[\"price\"],[\"event_year\"],[\"event_month\"]]}},\"node-1708784412691\":{\"EvaluateDataQualityMultiFrame\":{\"AdditionalDataSources\":{},\"AdditionalOptions\":{\"observations.scope\":\"ALL\",\"performanceTuning.caching\":\"CACHE_NOTHING\"},\"Inputs\":[\"node-1708783631007\"],\"Name\":\"Evaluate Data Quality\",\"PublishingOptions\":{\"CloudWatchMetricsEnabled\":true,\"ResultsPublishingEnabled\":true,\"ResultsS3Prefix\":\"s3://sales-2019/data-quality-fail/\"},\"Ruleset\":\"Rules = [\\nColumnValues \\\"event_time\\\" matches \\\"^2019.*$\\\"\\n    \\n]\",\"StopJobOnFailureOptions\":{\"StopJobOnFailureTiming\":\"Immediate\"}}},\"node-1711003763448\":{\"S3GlueParquetTarget\":{\"Compression\":\"snappy\",\"Inputs\":[\"node-1708786714412\"],\"Name\":\"S3 Target\",\"PartitionKeys\":[[\"event_year\"],[\"event_month\"]],\"Path\":\"s3://partitioned-sales-bucket\",\"SchemaChangePolicy\":{\"Database\":\"sales_db\",\"EnableUpdateCatalog\":true,\"Table\":\"sales_table\",\"UpdateBehavior\":\"UPDATE_IN_DATABASE\"}}}}",
+  "sourceControlDetails" : {
+    "provider" : "GITHUB",
+    "repository" : "example-glue-job",
+    "branch" : "main",
+    "folder" : "example_etl"
+  }
+}
